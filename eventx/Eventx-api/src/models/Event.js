@@ -1,32 +1,33 @@
 import mongoose from "mongoose";
 
-// Event schema
 const eventSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: true, // Event title is required
+      required: true,
     },
     description: {
       type: String,
     },
     date: {
       type: Date,
-      required: true, // Event date is required
+      required: true,
     },
     location: {
       type: String,
-      required: true, // Event location is required
+      required: true,
     },
-    organizer: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User", // Reference to User model
       required: true,
     },
   },
-  { timestamps: true } // Automatically add createdAt & updatedAt
+  {
+    timestamps: true, // Automatically add createdAt & updatedAt
+  }
 );
 
-// Export model
 const Event = mongoose.model("Event", eventSchema);
+
 export default Event;

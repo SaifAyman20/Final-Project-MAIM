@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import User from "./src/models/User.js";
 import Event from "./src/models/Event.js";
 import userRoutes from "./src/routes/userRoutes.js";
+import eventRoutes from "./src/routes/eventRoutes.js";
 
 // Load environment variables
 dotenv.config();
@@ -16,6 +17,7 @@ app.use(express.json());
 
 // Routes
 app.use("/api/users", userRoutes);
+app.use("/api/events", eventRoutes);
 
 // Connect to MongoDB
 mongoose
