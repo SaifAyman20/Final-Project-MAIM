@@ -1,0 +1,15 @@
+.post {
+  border: 2px solid var(--primecolor);
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.post h2 {
+  margin: 0 0 10px;
+}
+
+.post p {
+  margin: 0;
+}
