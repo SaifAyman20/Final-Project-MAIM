@@ -1,5 +1,13 @@
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+
+// generate token
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: "30d", // التوكين ينتهي بعد 30 يوم
+  });
+};
 
 // REGISTER
 export const registerUser = async (req, res) => {
@@ -23,11 +31,12 @@ export const registerUser = async (req, res) => {
       password: hashedPassword,
     });
 
-    // return user without password
+    // return user without password + token
     res.status(201).json({
       _id: user._id,
       name: user.name,
       email: user.email,
+      token: generateToken(user._id),
     });
   } catch (err) {
     console.error(err.message);
@@ -52,11 +61,12 @@ export const loginUser = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // return user without password
+    // return user without password + token
     res.json({
       _id: user._id,
       name: user.name,
       email: user.email,
+      token: generateToken(user._id),
     });
   } catch (err) {
     console.error(err.message);

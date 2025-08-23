@@ -1,14 +1,16 @@
 import express from "express";
 import { registerUser, loginUser } from "../controllers/userController.js";
+import protect from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// @route   POST /api/users/register
-// @desc    Register new user
 router.post("/register", registerUser);
-
-// @route   POST /api/users/login
-// @desc    Login user
 router.post("/login", loginUser);
+
+// Protected example
+router.get("/profile", protect, (req, res) => {
+  // req.user is attached by protect()
+  res.json(req.user);
+});
 
 export default router;
