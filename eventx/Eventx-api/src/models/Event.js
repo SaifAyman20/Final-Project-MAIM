@@ -1,33 +1,28 @@
-import mongoose from "mongoose";
+import express from "express";
+import protect from "../middleware/authMiddleware.js";
+import eventController from "../controllers/eventController.js";
 
-const eventSchema = new mongoose.Schema(
-  {
-    title: {
-      type: String,
-      required: true,
-    },
-    description: {
-      type: String,
-    },
-    date: {
-      type: Date,
-      required: true,
-    },
-    location: {
-      type: String,
-      required: true,
-    },
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // Reference to User model
-      required: true,
-    },
-  },
-  {
-    timestamps: true, // Automatically add createdAt & updatedAt
-  }
-);
+const router = express.Router();
 
-const Event = mongoose.model("Event", eventSchema);
+// Events CRUD
+router.post("/", protect, eventController.createEvent);
+router.get("/", eventController.getEvents);
+router.get("/:id", eventController.getEventById);
+router.put("/:id", protect, eventController.updateEvent);
+router.delete("/:id", protect, eventController.deleteEvent);
 
-export default Event;
+// RSVP
+router.put("/:id/rsvp", protect, eventController.toggleRSVP);
+
+// Likes
+router.put("/:id/like", protect, eventController.toggleLike);
+router.get("/liked/me", protect, eventController.getLikedEvents);
+
+// Comments
+router.post("/:id/comments", protect, eventController.addComment);
+router.delete("/:id/comments/:commentId", protect, eventController.deleteComment);
+
+// User's Events
+router.get("/user/me", protect, eventController.getUserEvents);
+
+export default router;
