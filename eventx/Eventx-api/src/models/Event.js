@@ -1,28 +1,30 @@
-import express from "express";
-import protect from "../middleware/authMiddleware.js";
-import eventController from "../controllers/eventController.js";
+import mongoose from "mongoose";
 
-const router = express.Router();
+const eventSchema = new mongoose.Schema(
+  {
+    title: { type: String, required: true },
+    description: { type: String },
+    date: { type: Date, required: true },
+    location: { type: String, required: true },
+    category: { type: String },
 
-// Events CRUD
-router.post("/", protect, eventController.createEvent);
-router.get("/", eventController.getEvents);
-router.get("/:id", eventController.getEventById);
-router.put("/:id", protect, eventController.updateEvent);
-router.delete("/:id", protect, eventController.deleteEvent);
+    // Seats
+    totalSeats: { type: Number, required: true },   // إجمالي المقاعد
+    bookedSeats: [{ type: String }],                // أرقام المقاعد المحجوزة
 
-// RSVP
-router.put("/:id/rsvp", protect, eventController.toggleRSVP);
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    attendees: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    comments: [
+      {
+        user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        text: { type: String },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
+  },
+  { timestamps: true }
+);
 
-// Likes
-router.put("/:id/like", protect, eventController.toggleLike);
-router.get("/liked/me", protect, eventController.getLikedEvents);
-
-// Comments
-router.post("/:id/comments", protect, eventController.addComment);
-router.delete("/:id/comments/:commentId", protect, eventController.deleteComment);
-
-// User's Events
-router.get("/user/me", protect, eventController.getUserEvents);
-
-export default router;
+const Event = mongoose.model("Event", eventSchema);
+export default Event;

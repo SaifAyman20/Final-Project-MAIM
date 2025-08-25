@@ -4,7 +4,7 @@ import Notification from "../models/Notification.js";
 
 // @desc    Create new event
 // @route   POST /api/events
-// @access  Private
+// @access  Private (admin only)
 const createEvent = asyncHandler(async (req, res) => {
   const { title, description, date, location, category } = req.body;
 
@@ -69,7 +69,7 @@ const getEventById = asyncHandler(async (req, res) => {
 
 // @desc    Update event
 // @route   PUT /api/events/:id
-// @access  Private (owner only)
+// @access  Private (admin only)
 const updateEvent = asyncHandler(async (req, res) => {
   const event = await Event.findById(req.params.id);
 
@@ -97,7 +97,7 @@ const updateEvent = asyncHandler(async (req, res) => {
 
 // @desc    Delete event
 // @route   DELETE /api/events/:id
-// @access  Private (owner only)
+// @access  Private (admin only)
 const deleteEvent = asyncHandler(async (req, res) => {
   const event = await Event.findById(req.params.id);
 
@@ -139,7 +139,8 @@ const toggleRSVP = asyncHandler(async (req, res) => {
     // Create notification
     await Notification.create({
       user: event.user,
-      type: "RSVP",
+      sender: req.user._id,
+      type: "rsvp",
       message: `${req.user.name} is attending your event "${event.title}"`,
       event: event._id,
     });
@@ -172,7 +173,8 @@ const toggleLike = asyncHandler(async (req, res) => {
     // Create notification
     await Notification.create({
       user: event.user,
-      type: "Like",
+      sender: req.user._id,
+      type: "like",
       message: `${req.user.name} liked your event "${event.title}"`,
       event: event._id,
     });
@@ -203,12 +205,16 @@ const addComment = asyncHandler(async (req, res) => {
   // Create notification
   await Notification.create({
     user: event.user,
-    type: "Comment",
+    sender: req.user._id,
+    type: "comment",
     message: `${req.user.name} commented on your event "${event.title}"`,
     event: event._id,
   });
 
-  const updatedEvent = await Event.findById(req.params.id).populate("comments.user", "name email");
+  const updatedEvent = await Event.findById(req.params.id).populate(
+    "comments.user",
+    "name email"
+  );
 
   res.status(201).json(updatedEvent.comments);
 });
@@ -246,7 +252,10 @@ const deleteComment = asyncHandler(async (req, res) => {
 // @route   GET /api/events/liked/me
 // @access  Private
 const getLikedEvents = asyncHandler(async (req, res) => {
-  const events = await Event.find({ likes: req.user._id }).populate("user", "name email");
+  const events = await Event.find({ likes: req.user._id }).populate(
+    "user",
+    "name email"
+  );
   res.json(events);
 });
 
@@ -254,7 +263,10 @@ const getLikedEvents = asyncHandler(async (req, res) => {
 // @route   GET /api/events/user/me
 // @access  Private
 const getUserEvents = asyncHandler(async (req, res) => {
-  const events = await Event.find({ user: req.user._id }).populate("user", "name email");
+  const events = await Event.find({ user: req.user._id }).populate(
+    "user",
+    "name email"
+  );
   res.json(events);
 });
 

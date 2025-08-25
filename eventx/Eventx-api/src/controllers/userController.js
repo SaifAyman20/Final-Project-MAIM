@@ -5,14 +5,14 @@ import jwt from "jsonwebtoken";
 // generate token
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: "30d", // التوكين ينتهي بعد 30 يوم
+    expiresIn: "30d",
   });
 };
 
 // REGISTER
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, gender, location, birthYear } = req.body;
 
     // check if user already exists
     const existingUser = await User.findOne({ email });
@@ -25,17 +25,33 @@ export const registerUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // create new user
-    const user = await User.create({
+    let user = await User.create({
       name,
       email,
       password: hashedPassword,
+      gender: gender || "other",
+      location: location || "Unknown",
+      birthYear: birthYear || null,
     });
+
+    // Optional: seed first admin by email
+    if (
+      process.env.SEED_ADMIN_EMAIL &&
+      user.email === process.env.SEED_ADMIN_EMAIL
+    ) {
+      user.role = "admin";
+      await user.save();
+    }
 
     // return user without password + token
     res.status(201).json({
       _id: user._id,
       name: user.name,
       email: user.email,
+      role: user.role,
+      gender: user.gender,
+      location: user.location,
+      birthYear: user.birthYear,
       token: generateToken(user._id),
     });
   } catch (err) {
@@ -66,6 +82,10 @@ export const loginUser = async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
+      role: user.role,
+      gender: user.gender,
+      location: user.location,
+      birthYear: user.birthYear,
       token: generateToken(user._id),
     });
   } catch (err) {

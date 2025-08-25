@@ -6,8 +6,8 @@ import Notification from "../models/Notification.js";
 // @access  Private
 const getNotifications = asyncHandler(async (req, res) => {
   const notifications = await Notification.find({ user: req.user._id })
-    .populate("sender", "name email")
-    .populate("event", "title")
+    .populate("sender", "name email") // مين بعت الإشعار
+    .populate("event", "title")       // الحدث المرتبط
     .sort({ createdAt: -1 });
 
   res.json(notifications);

@@ -1,20 +1,23 @@
-import { useEffect, useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 
 function App() {
-  const [data, setData] = useState(null);
-
-  useEffect(() => {
-    fetch("http://localhost:5000/api/test")
-      .then(res => res.json())
-      .then(data => setData(data.message))
-      .catch(err => console.error(err));
-  }, []);
-
   return (
-    <div>
-      <h1>EventX 🎉</h1>
-      <p>{data ? data : "جاري تحميل البيانات..."}</p>
-    </div>
+    <Router>
+      <div className="min-h-screen bg-gray-50">
+        <Navbar />
+        <div className="container mx-auto p-4">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+          </Routes>
+        </div>
+      </div>
+    </Router>
   );
 }
 
