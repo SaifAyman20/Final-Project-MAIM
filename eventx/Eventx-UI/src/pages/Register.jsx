@@ -1,13 +1,40 @@
 import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import InputField from "../components/InputField";
+import { useAuth } from "../context/AuthContext";
 
 export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
-  const handleSubmit = (e) => {
+  const navigate = useNavigate();
+  const { registerUser } = useAuth();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Register:", { name, email, password });
+
+    if (!name || !email || !password) {
+      setMessage("All fields are required!");
+      return;
+    }
+
+    setLoading(true);
+    setMessage("");
+
+    try {
+      await registerUser({ name, email, password });
+      setMessage("✅ Registered successfully!");
+      setTimeout(() => {
+        navigate("/events");
+      }, 1000);
+    } catch (error) {
+      setMessage("❌ Registration failed, try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -15,39 +42,41 @@ export default function Register() {
       <div className="bg-black text-white p-8 rounded-2xl shadow-lg w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-center">Register</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <input
+          <InputField
             type="text"
             placeholder="Name"
-            className="w-full px-4 py-2 rounded-lg text-black"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
-          <input
+          <InputField
             type="email"
             placeholder="Email"
-            className="w-full px-4 py-2 rounded-lg text-black"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-          <input
+          <InputField
             type="password"
             placeholder="Password"
-            className="w-full px-4 py-2 rounded-lg text-black"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+
           <button
             type="submit"
-            className="w-full bg-white text-black py-2 rounded-lg font-semibold hover:bg-gray-200"
+            disabled={loading}
+            className="w-full bg-white text-black py-2 rounded-lg font-semibold hover:bg-gray-200 disabled:opacity-50"
           >
-            Register
+            {loading ? "Registering..." : "Register"}
           </button>
         </form>
+
+        {message && <p className="text-center text-sm mt-3">{message}</p>}
+
         <p className="text-gray-400 text-sm text-center mt-4">
           Already have an account?{" "}
-          <a href="/login" className="text-white font-semibold hover:underline">
+          <Link to="/login" className="text-white font-semibold hover:underline">
             Login
-          </a>
+          </Link>
         </p>
       </div>
     </div>

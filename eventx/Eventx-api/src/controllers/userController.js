@@ -52,7 +52,7 @@ export const registerUser = async (req, res) => {
       gender: user.gender,
       location: user.location,
       birthYear: user.birthYear,
-      token: generateToken(user._id),
+      token: generateToken(user.id),
     });
   } catch (err) {
     console.error(err.message);
@@ -86,7 +86,7 @@ export const loginUser = async (req, res) => {
       gender: user.gender,
       location: user.location,
       birthYear: user.birthYear,
-      token: generateToken(user._id),
+      token: generateToken(user.id),
     });
   } catch (err) {
     console.error(err.message);
